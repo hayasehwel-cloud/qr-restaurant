@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../lib/phpqrcode.php';
 require_once __DIR__ . '/../db/config.php';
 
 $slug = preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['slug'] ?? '');
@@ -10,11 +9,18 @@ $stmt->execute([$slug]);
 if (!$stmt->fetch()) { http_response_code(404); exit; }
 
 $base_url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
-$url = $base_url . '/m/' . $slug;
+$url = urlencode($base_url . '/m/' . $slug);
 
-if (!empty($_GET['download'])) {
-    header('Content-Disposition: attachment; filename="qr-' . $slug . '.png"');
-}
+$download = !empty($_GET['download']);
 
-header('Content-Type: image/png');
-QRcode::png($url, false, QR_ECLEVEL_H, 8, 2);
+header('Content-Type: text/html; charset=utf-8');
+echo '<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>QR Code</title></head>
+<body style="text-align:center;padding:40px;font-family:sans-serif">
+<h2>QR Code - طاولة</h2>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . $url . '" width="300" height="300">
+<br><br>
+<a href="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . $url . '" download="qr-' . $slug . '.png">تحميل QR</a>
+</body>
+</html>';
