@@ -1,0 +1,6 @@
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^m/([a-zA-Z0-9_-]+)$ /index.php [QSA,L]
+RewriteRule ^api/(.*)$ /api/$1 [QSA,L]
